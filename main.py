@@ -8,7 +8,7 @@ import requests
 from bs4 import BeautifulSoup
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer, HTTPBasicCredentials, HTTPBasic
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr
 from sqlalchemy import Column, Integer, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -29,8 +29,9 @@ security = HTTPBasic()
 class Usuario(Base):
     __tablename__ = "usuarios"
     id = Column(Integer, primary_key=True, index=True)
-    nome = Column(String, unique=True, index=True)
+    usuario = Column(String, unique=True, index=True)
     senha_hash = Column(String)
+    email = Column(String, unique=True, index=True, nullable=False)
 
 Base.metadata.create_all(bind=engine)
 
@@ -186,8 +187,9 @@ def validar_subopcao(opcao: str, subopcao: str) -> bool:
 
 # Schemas Pydantic
 class UsuarioCreate(BaseModel):
-    nome: str
+    usuario: str
     senha: str
+    email: EmailStr
 
 class Token(BaseModel):
     access_token: str
@@ -216,11 +218,13 @@ app = FastAPI(
 def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     # Cria um novo usuário no banco de dados
     # Verifica se o usuário já existe
-    usuario_existente = db.query(Usuario).filter(Usuario.nome == usuario.nome).first()
+    usuario_existente = db.query(Usuario).filter(
+        (Usuario.usuario == usuario.usuario) | (Usuario.email == usuario.email)
+    ).first()
     if usuario_existente:
-        raise HTTPException(status_code=400, detail="Usuário já existe")
+        raise HTTPException(status_code=400, detail="Usuário ou e-mail já existe")
     senha_hash = pwd_context.hash(usuario.senha)
-    novo_usuario = Usuario(nome=usuario.nome, senha_hash=senha_hash)
+    novo_usuario = Usuario(usuario=usuario.usuario, senha_hash=senha_hash, email=usuario.email)
     db.add(novo_usuario)
     db.commit()
     db.refresh(novo_usuario)
@@ -232,11 +236,11 @@ def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
 def login(credentials: HTTPBasicCredentials = Depends(security), db: Session = Depends(get_db)):
     # Verifica as credenciais do usuário
     # Se as credenciais forem válidas, gera um token de acesso
-    usuario = db.query(Usuario).filter(Usuario.nome == credentials.username).first()
+    usuario = db.query(Usuario).filter(Usuario.usuario == credentials.username).first()
     if not usuario or not pwd_context.verify(credentials.password, usuario.senha_hash):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-    access_token = criar_token_acesso(data={"sub": usuario.nome})
+    access_token = criar_token_acesso(data={"sub": usuario.usuario})
 
     return {"access_token": access_token, "token_type": "bearer"}
 
