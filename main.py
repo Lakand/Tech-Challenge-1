@@ -1,7 +1,7 @@
 import re
 import unicodedata
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Optional, List, Dict, Any
 
 import jwt
 import requests
@@ -9,7 +9,7 @@ from bs4 import BeautifulSoup
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.security import OAuth2PasswordBearer, HTTPBasicCredentials, HTTPBasic
 from pydantic import BaseModel, EmailStr
-from sqlalchemy import Column, Integer, String, create_engine
+from sqlalchemy import Column, Integer, String, JSON, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from passlib.context import CryptContext
@@ -19,7 +19,7 @@ SECRET_KEY = "chave_secreta_tech_challenge"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-DATABASE_URL = "sqlite:///./usuarios.db"
+DATABASE_URL = "sqlite:///./scrap_embrapa.db"
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
@@ -32,6 +32,16 @@ class Usuario(Base):
     usuario = Column(String, unique=True, index=True)
     senha_hash = Column(String)
     email = Column(String, unique=True, index=True, nullable=False)
+
+class TabelaScrap(Base):
+    __tablename__ = "tabelas_scrap"
+
+    id = Column(Integer, primary_key=True, index=True)
+    fonte = Column(String, nullable=False)
+    ano = Column(String, nullable=False)
+    opcao = Column(String, nullable=False)
+    subopcao = Column(String, nullable=False)
+    tabela = Column(JSON, nullable=False)
 
 Base.metadata.create_all(bind=engine)
 
@@ -195,6 +205,13 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
+class TabelaScrapCreate(BaseModel):
+    fonte: str
+    ano: str
+    opcao: str
+    subopcao: str
+    tabela: List[Dict[str, Any]]
+
 # Dependência de sessão
 
 def get_db():
@@ -251,7 +268,8 @@ async def scrap_data(
     ano: Optional[str] = '2023',
     opcao: Optional[str] = '02',
     subopcao: Optional[str] = '01',
-    usuario: str = Depends(verificar_token)
+    usuario: str = Depends(verificar_token),
+    db: Session = Depends(get_db)
 ):
 
     opcao_normalizada, subopcao_normalizada = converte_opcao_subopcao(opcao, subopcao)
@@ -259,8 +277,8 @@ async def scrap_data(
 
     url = f'http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_{opcao_normalizada}&subopcao=subopt_{subopcao_normalizada}'
     try:
-        # Faz a requisição para a URL fornecida
-        response = requests.get(url)
+        # Faz a requisição para o site
+        response = requests.get(url, timeout=10)
         response.raise_for_status()  # Gera exceção se a resposta for erro
         soup = BeautifulSoup(response.text, "html.parser")
 
@@ -268,7 +286,7 @@ async def scrap_data(
         tabela = soup.find_all('table', class_= 'tb_base tb_dados')
 
         if not tabela:
-            raise HTTPException(status_code=404, detail="Tabela não encontrada")
+            raise HTTPException(status_code=404, detail="Tabela não encontrada no site da Embrapa.")
         
         # Inicializa a lista de dados
         dados_tabela = []
@@ -285,6 +303,25 @@ async def scrap_data(
                     dados_tabela.append(dict(zip(cabecalho, cols)))
         
         # Retorna os dados extraídos como JSON"""
+        
+        registro_existente = db.query(TabelaScrap).filter_by(
+            ano=ano,
+            opcao=opcao_normalizada,
+            subopcao=subopcao_normalizada
+        ).first()
+
+        if not registro_existente:
+            # Cria e insere o novo registro
+            registro_scrap = TabelaScrap(
+                fonte=url,
+                ano=ano,
+                opcao=opcao_normalizada,
+                subopcao=subopcao_normalizada,
+                tabela=dados_tabela
+            )
+            db.add(registro_scrap)
+            db.commit()
+            db.refresh(registro_scrap)
         return {
             "fonte": url,
             "ano": ano,
@@ -294,13 +331,24 @@ async def scrap_data(
         }        
 
 
-    except requests.exceptions.RequestException as e:
-        # Captura erros gerais relacionados à requisição (rede, timeout, etc.)
-        raise HTTPException(status_code=500, detail=f"Erro na requisição: {str(e)}")
-    
-    except requests.exceptions.HTTPError as e:
-        # Captura erros específicos de status HTTP (erro 404, 500, etc.)
-        raise HTTPException(status_code=response.status_code, detail=f"Erro HTTP: {response.status_code}")
+    except (requests.exceptions.RequestException, requests.exceptions.HTTPError):
+        # Falha no scraping: tenta buscar no banco de dados
+        registro_fallback = db.query(TabelaScrap).filter_by(
+            ano=ano,
+            opcao=opcao_normalizada,
+            subopcao=subopcao_normalizada
+        ).first()
+
+        if registro_fallback:
+            return {
+                "fonte": registro_fallback.fonte + " (backup local)",
+                "ano": registro_fallback.ano,
+                "opcao": registro_fallback.opcao,
+                "subopcao": registro_fallback.subopcao,
+                "tabela": registro_fallback.tabela
+            }
+        else:
+            raise HTTPException(status_code=503, detail="Site da Embrapa está fora do ar e não há dados armazenados no banco.")
     
     except Exception as e:
         # Captura qualquer outra exceção não prevista
