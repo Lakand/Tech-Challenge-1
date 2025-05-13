@@ -13,13 +13,12 @@ from sqlalchemy import Column, Integer, String, JSON, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from passlib.context import CryptContext
+from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, DATABASE_URL, SCRAP_TIMEOUT_SECONDS
 
 
-SECRET_KEY = "chave_secreta_tech_challenge"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-DATABASE_URL = "sqlite:///./scrap_embrapa.db"
+
+
 engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 Base = declarative_base()
@@ -278,7 +277,7 @@ async def scrap_data(
     url = f'http://vitibrasil.cnpuv.embrapa.br/index.php?ano={ano}&opcao=opt_{opcao_normalizada}&subopcao=subopt_{subopcao_normalizada}'
     try:
         # Faz a requisição para o site
-        response = requests.get(url, timeout=10)
+        response = requests.get(url, timeout=SCRAP_TIMEOUT_SECONDS)
         response.raise_for_status()  # Gera exceção se a resposta for erro
         soup = BeautifulSoup(response.text, "html.parser")
 
