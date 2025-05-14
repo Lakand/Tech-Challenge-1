@@ -13,7 +13,7 @@ from sqlalchemy import Column, Integer, String, JSON, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from passlib.context import CryptContext
-from config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, DATABASE_URL, SCRAP_TIMEOUT_SECONDS
+from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, DATABASE_URL, SCRAP_TIMEOUT_SECONDS
 
 
 
