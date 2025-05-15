@@ -6,8 +6,9 @@ from app.database import SessionLocal
 from app.auth.auth_utils import verificar_token
 from app.scrap.validators import converte_opcao_subopcao, validar_parametros_entrada
 from app.scrap.scraper import scrap_tabela_embrapa
+from app.schemas import TabelaScrapResponse
 
-router = APIRouter()
+router = APIRouter(tags=["Scraping"])
 
 # Dependência de banco
 def get_db():
@@ -18,7 +19,14 @@ def get_db():
         db.close()
 
 
-@router.get("/scrap")
+@router.get("/scrap", 
+            summary="Faz scraping dos dados da Embrapa",
+            description="Retorna os dados de produção/importação/exportação " \
+            "de uvas a partir do site da Embrapa. Caso o site esteja fora " \
+            "do ar, os dados do banco local são usados.",
+            response_model=TabelaScrapResponse
+            )
+
 def scrap(
     ano: Optional[str] = '2023',
     opcao: Optional[str] = '02',

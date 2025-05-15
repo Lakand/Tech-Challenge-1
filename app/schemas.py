@@ -8,7 +8,6 @@ class UsuarioCreate(BaseModel):
     senha: str
     email: EmailStr
 
-    # Validação adicional para garantir o mínimo de caracteres
     @field_validator("usuario", "senha")
     def validar_minimo_caracteres(cls, valor, info):
         if info.field_name == "usuario" and len(valor) < 3:
@@ -31,3 +30,33 @@ class TabelaScrapCreate(BaseModel):
     opcao: str
     subopcao: str
     tabela: List[Dict[str, Any]]
+
+
+class TabelaScrapResponse(BaseModel):
+    fonte: str
+    ano: str
+    opcao: str
+    subopcao: str
+    tabela: List[Dict[str, Any]]
+
+    class Config:
+        json_schema_extra  = {
+            "example": {
+                "fonte": "http://vitibrasil.cnpuv.embrapa.br/index.php?ano=2023&opcao=opt_02&subopcao=subopt_01",
+                "ano": "2023",
+                "opcao": "02",
+                "subopcao": "01",
+                "tabela": [
+                    {
+                        "Tipo de Uva": "Vinífera",
+                        "Quantidade (toneladas)": "1234",
+                        "Ano": "2023"
+                    },
+                    {
+                        "Tipo de Uva": "Mesa",
+                        "Quantidade (toneladas)": "5678",
+                        "Ano": "2023"
+                    }
+                ]
+            }
+        }
