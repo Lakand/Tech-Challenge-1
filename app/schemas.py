@@ -1,5 +1,7 @@
-from typing import List, Dict, Any
-from pydantic import BaseModel, EmailStr, constr, field_validator
+from typing import Any, Dict, List
+
+from pydantic import BaseModel, EmailStr, field_validator
+
 
 class UsuarioCreate(BaseModel):
     usuario: str
@@ -13,14 +15,16 @@ class UsuarioCreate(BaseModel):
         if info.field_name == "senha" and len(valor) < 6:
             raise ValueError("O campo 'senha' deve ter pelo menos 6 caracteres.")
         return valor
+
     class Config:
         json_schema_extra = {
             "example": {
                 "usuario": "usuario1",
                 "senha": "senha123",
-                "email": "usuario1@email.com"
+                "email": "usuario1@email.com",
             }
         }
+
 
 class UsuarioOut(BaseModel):
     id: int
@@ -33,9 +37,10 @@ class UsuarioOut(BaseModel):
             "example": {
                 "id": 1,
                 "usuario": "usuario1",
-                "email": "usuario1@email.com"
+                "email": "usuario1@email.com",
             }
         }
+
 
 class Token(BaseModel):
     access_token: str
@@ -45,7 +50,7 @@ class Token(BaseModel):
         json_schema_extra = {
             "example": {
                 "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer"
+                "token_type": "bearer",
             }
         }
 
@@ -76,13 +81,13 @@ class TabelaScrapResponse(BaseModel):
                     {
                         "Tipo de Uva": "Vinífera",
                         "Quantidade (toneladas)": "1234",
-                        "Ano": "2023"
+                        "Ano": "2023",
                     },
                     {
                         "Tipo de Uva": "Mesa",
                         "Quantidade (toneladas)": "5678",
-                        "Ano": "2023"
-                    }
-                ]
+                        "Ano": "2023",
+                    },
+                ],
             }
         }

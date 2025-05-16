@@ -1,11 +1,14 @@
 # auth/auth_utils.py
 
 from datetime import datetime, timedelta
+
+import jwt
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from passlib.context import CryptContext
-import jwt
+
 from app.config import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -13,7 +16,9 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def criar_token_acesso(data: dict, expires_delta: timedelta = None) -> str:
     to_encode = data.copy()
-    expire = datetime.utcnow() + (expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    expire = datetime.utcnow() + (
+        expires_delta or timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    )
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
@@ -29,3 +34,4 @@ def verificar_token(token: str = Depends(oauth2_scheme)) -> str:
         raise HTTPException(status_code=401, detail="Token expirado")
     except jwt.PyJWTError:
         raise HTTPException(status_code=401, detail="Token inválido")
+

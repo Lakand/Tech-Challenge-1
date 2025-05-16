@@ -4,44 +4,45 @@ from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from sqlalchemy.orm import Session
 
-from app.database import SessionLocal
-from app.models import Usuario
-from app.schemas import UsuarioCreate, UsuarioOut, Token
-from app.auth.auth_utils import pwd_context, criar_token_acesso
+from app.auth.auth_utils import criar_token_acesso, pwd_context
 from app.database import get_db
+from app.models import Usuario
+from app.schemas import Token, UsuarioCreate, UsuarioOut
+
 
 router = APIRouter(
     prefix="/auth",
-    tags=["Autenticação"]
+    tags=["Autenticação"],
 )
 
 security = HTTPBasic()
 
 
-@router.post("/registrar_usuario",
-            status_code=201,
-            response_model=UsuarioOut,
-            summary="Registrar novo usuário",
-            description="""
-                            Cria um novo usuário com `nome de usuário`, `senha` e `e-mail`.
+@router.post(
+    "/registrar_usuario",
+    status_code=201,
+    response_model=UsuarioOut,
+    summary="Registrar novo usuário",
+    description="""
+    Cria um novo usuário com `nome de usuário`, `senha` e `e-mail`.
 
-                            - A senha é armazenada de forma segura usando hash (bcrypt).
-                            - O e-mail e o nome de usuário devem ser únicos.
-                            - Retorna uma mensagem de confirmação.
-                            """,
-            responses={
-                400: {
-                    "description": "Usuário ou e-mail já existe",
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "detail": "Usuário ou e-mail já existe"
-                            }
-                        }
+    - A senha é armazenada de forma segura usando hash (bcrypt).
+    - O e-mail e o nome de usuário devem ser únicos.
+    - Retorna uma mensagem de confirmação.
+    """,
+    responses={
+        400: {
+            "description": "Usuário ou e-mail já existe",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Usuário ou e-mail já existe"
                     }
                 }
-            }
-            )
+            },
+        }
+    },
+)
 def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     """
     Registra um usuário com `usuario`, `senha` e `email`.
@@ -57,7 +58,7 @@ def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     novo_usuario = Usuario(
         usuario=usuario.usuario,
         senha_hash=senha_hash,
-        email=usuario.email
+        email=usuario.email,
     )
     db.add(novo_usuario)
     db.commit()
@@ -65,30 +66,34 @@ def criar_usuario(usuario: UsuarioCreate, db: Session = Depends(get_db)):
     return novo_usuario
 
 
-@router.post("/token",
-            response_model=Token,
-            summary="Realizar login e obter token JWT",
-            description="""
-            Realiza autenticação de um usuário via `HTTP Basic Auth`.
+@router.post(
+    "/token",
+    response_model=Token,
+    summary="Realizar login e obter token JWT",
+    description="""
+    Realiza autenticação de um usuário via `HTTP Basic Auth`.
 
-            - Retorna um token JWT se as credenciais estiverem corretas.
-            - O token pode ser usado para acessar rotas protegidas (via `Authorization: Bearer <token>`).
-            - A autenticação é feita por cabeçalho `Authorization: Basic`.
-            """,
-            responses={
-                401: {
-                    "description": "Credenciais inválidas",
-                    "content": {
-                        "application/json": {
-                            "example": {
-                                "detail": "Credenciais inválidas"
-                            }
-                        }
+    - Retorna um token JWT se as credenciais estiverem corretas.
+    - O token pode ser usado para acessar rotas protegidas (via `Authorization: Bearer <token>`).
+    - A autenticação é feita por cabeçalho `Authorization: Basic`.
+    """,
+    responses={
+        401: {
+            "description": "Credenciais inválidas",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Credenciais inválidas"
                     }
                 }
-            })
-
-def login(credentials: HTTPBasicCredentials = Depends(security), db: Session = Depends(get_db)):
+            },
+        }
+    },
+)
+def login(
+    credentials: HTTPBasicCredentials = Depends(security),
+    db: Session = Depends(get_db),
+):
     """
     Autentica usuário e retorna JWT.
     """
