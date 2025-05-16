@@ -16,9 +16,9 @@ app = FastAPI(title="Tech Challenge API - Fase 1",
                   "email": "c.gabriel.vieira@hotmail.com",
                   "url": "https://github.com/seu-usuario/seu-repo"
               },
-              license_info={
-                  "name": "MIT"
-              })
+              license_info={"name": "MIT License",
+                            "url": "https://opensource.org/licenses/MIT"},  
+              )
 
 Base.metadata.create_all(bind=engine)
 

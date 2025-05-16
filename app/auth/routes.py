@@ -8,6 +8,7 @@ from app.database import SessionLocal
 from app.models import Usuario
 from app.schemas import UsuarioCreate, UsuarioOut, Token
 from app.auth.auth_utils import pwd_context, criar_token_acesso
+from app.database import get_db
 
 router = APIRouter(
     prefix="/auth",
@@ -16,13 +17,6 @@ router = APIRouter(
 
 security = HTTPBasic()
 
-# Dependência de banco
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 @router.post("/registrar_usuario",
             status_code=201,

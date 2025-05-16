@@ -7,19 +7,12 @@ from app.auth.auth_utils import verificar_token
 from app.scrap.validators import converte_opcao_subopcao, validar_parametros_entrada
 from app.scrap.scraper import scrap_tabela_embrapa
 from app.schemas import TabelaScrapResponse
+from app.database import get_db
 
 router = APIRouter(
     prefix="/scrap",
     tags=["Scraping"]
 )
-
-# Dependência de banco
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @router.get("/tabela",
