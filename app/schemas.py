@@ -1,8 +1,6 @@
 from typing import List, Dict, Any
 from pydantic import BaseModel, EmailStr, constr, field_validator
 
-
-# Schema para criação de usuário (entrada)
 class UsuarioCreate(BaseModel):
     usuario: str
     senha: str
@@ -15,15 +13,43 @@ class UsuarioCreate(BaseModel):
         if info.field_name == "senha" and len(valor) < 6:
             raise ValueError("O campo 'senha' deve ter pelo menos 6 caracteres.")
         return valor
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "usuario": "usuario1",
+                "senha": "senha123",
+                "email": "usuario1@email.com"
+            }
+        }
 
+class UsuarioOut(BaseModel):
+    id: int
+    usuario: str
+    email: EmailStr
 
-# Schema para o token JWT (retorno do login)
+    class Config:
+        from_attributes = True
+        json_schema_extra = {
+            "example": {
+                "id": 1,
+                "usuario": "usuario1",
+                "email": "usuario1@email.com"
+            }
+        }
+
 class Token(BaseModel):
     access_token: str
     token_type: str
 
+    class Config:
+        json_schema_extra = {
+            "example": {
+                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "token_type": "bearer"
+            }
+        }
 
-# Schema para criação de scrap (entrada)
+
 class TabelaScrapCreate(BaseModel):
     fonte: str
     ano: str
@@ -40,7 +66,7 @@ class TabelaScrapResponse(BaseModel):
     tabela: List[Dict[str, Any]]
 
     class Config:
-        json_schema_extra  = {
+        json_schema_extra = {
             "example": {
                 "fonte": "http://vitibrasil.cnpuv.embrapa.br/index.php?ano=2023&opcao=opt_02&subopcao=subopt_01",
                 "ano": "2023",
