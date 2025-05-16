@@ -39,7 +39,7 @@ def converte_opcao_subopcao(opcao: str, subopcao: str) -> tuple[str, str]:
 
 def validar_parametros_entrada(ano: str, opcao: str, subopcao: str) -> None:
     if not validar_ano(ano):
-        raise HTTPException(status_code=400, detail="Ano inválido. Deve estar entre 1970 e 2023.")
+        raise HTTPException(status_code=400, detail="Ano inválido. Deve estar entre 1970 e 2024.")
 
     if not validar_opcao(opcao):
         raise HTTPException(
@@ -60,7 +60,7 @@ def validar_parametros_entrada(ano: str, opcao: str, subopcao: str) -> None:
 def validar_ano(ano: str) -> bool:
     try:
         ano_int = int(ano)
-        return 1970 <= ano_int <= 2023
+        return 1970 <= ano_int <= 2024
     except ValueError:
         return False
 
