@@ -43,14 +43,14 @@ class UsuarioOut(BaseModel):
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
+    acesso_token: str
+    tipo_token: str
 
     class Config:
         json_schema_extra = {
             "example": {
-                "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-                "token_type": "bearer",
+                "acesso_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+                "tipo_token": "bearer",
             }
         }
 

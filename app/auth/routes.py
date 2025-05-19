@@ -101,5 +101,5 @@ def login(
     if not usuario or not pwd_context.verify(credentials.password, usuario.senha_hash):
         raise HTTPException(status_code=401, detail="Credenciais inválidas")
 
-    access_token = criar_token_acesso(data={"sub": usuario.usuario})
-    return {"access_token": access_token, "token_type": "bearer"}
+    acesso_token = criar_token_acesso(data={"sub": usuario.usuario})
+    return {"acesso_token": acesso_token, "tipo_token": "bearer"}

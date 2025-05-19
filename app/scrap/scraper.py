@@ -29,9 +29,9 @@ def scrap_tabela_embrapa(ano: str, opcao: str, subopcao: str, db: Session):
         for tabela in tabelas_html:
             cabecalho = [th.get_text(strip=True) for th in tabela.find_all("th")]
             for tr in tabela.find_all("tr")[1:]:
-                cols = [td.get_text(strip=True) for td in tr.find_all("td")]
-                if cols:
-                    dados_tabela.append(dict(zip(cabecalho, cols)))
+                coluna = [td.get_text(strip=True) for td in tr.find_all("td")]
+                if coluna:
+                    dados_tabela.append(dict(zip(cabecalho, coluna)))
 
         registro_existente = db.query(TabelaScrap).filter_by(
             ano=ano, opcao=opcao, subopcao=subopcao
