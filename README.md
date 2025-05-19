@@ -154,7 +154,7 @@ Esta rota realiza scraping dos dados do site da Embrapa Viticultura com base em 
 Ano dos dados desejados.
 
 - **Formato aceito:**  ano (ex: 2023)
-- **Intervalo válido:** de **1970 a 2023**
+- **Intervalo válido:** de **1970 a 2024**
 - Valores fora desse intervalo serão rejeitados com erro 400.
 
 ---
