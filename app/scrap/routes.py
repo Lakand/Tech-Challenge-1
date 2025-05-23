@@ -28,11 +28,28 @@ router = APIRouter(
     - Parâmetros aceitam tanto código quanto nomes normalizados (ex: '03' ou 'Processamento').
     """,
     responses={
+        400: {
+            "description": "Parâmetros de entrada inválidos.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Parâmetros de entrada (ano, opcao ou subopcao) inválidos."}}
+            },
+        },
+        401: {
+            "description": "Token JWT ausente ou inválido.",
+            "content": {
+                "application/json": {
+                    "example": {
+                        "detail": "Token inválido"}}
+            },
+        },
         404: {
             "description": "Tabela não encontrada no site da Embrapa.",
             "content": {
                 "application/json": {
-                    "example": {"detail": "Tabela não encontrada no site da Embrapa."}
+                    "example": {
+                        "detail": "Tabela não encontrada no site da Embrapa."}
                 }
             },
         },
@@ -45,13 +62,7 @@ router = APIRouter(
                     }
                 }
             },
-        },
-        401: {
-            "description": "Token JWT ausente ou inválido.",
-            "content": {
-                "application/json": {"example": {"detail": "Token inválido"}}
-            },
-        },
+        }
     },
 )
 def scrap(
