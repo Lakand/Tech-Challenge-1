@@ -1,4 +1,4 @@
-# Tech Challenge - API de Scraping da Embrapa
+# API de Scraping da Embrapa - Tech Challenge fase 1
 
 [![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
 [![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
