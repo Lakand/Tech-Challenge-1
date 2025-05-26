@@ -350,7 +350,7 @@ Ambas oferecem interface completa para testar todos os endpoints diretamente no 
 
 | Código | Descrição                                    |
 |--------|----------------------------------------------|
-| 400    | Parâmetros inválidos (ano, opção, subopção) |
+| 400    | Parâmetros inválidos                        |
 | 401    | Token JWT ausente, inválido ou expirado     |
 | 404    | Tabela não encontrada no site da Embrapa    |
 | 503    | Site fora do ar sem backup local disponível |
