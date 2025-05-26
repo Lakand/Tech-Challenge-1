@@ -1,51 +1,81 @@
 # Tech Challenge - API de Scraping da Embrapa
 
-API REST desenvolvida em FastAPI que realiza scraping de tabelas do site da Embrapa Viticultura. Inclui autenticação JWT, fallback com cache local em banco de dados.
+[![Python](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.115+-green.svg)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![API Status](https://img.shields.io/badge/API-Online-brightgreen.svg)](https://tech-challenge-api-embrapa.onrender.com/docs)
+
+API REST desenvolvida em FastAPI que realiza scraping de tabelas do site da Embrapa Viticultura. Inclui autenticação JWT, sistema de fallback com cache local em banco de dados SQLite e validação robusta de parâmetros.
+
+## 🌐 **API Online**
+
+🚀 **Acesse a API em produção:** https://tech-challenge-api-embrapa.onrender.com
+
+📖 **Documentação interativa:** https://tech-challenge-api-embrapa.onrender.com/docs
+
+## 🚀 Funcionalidades
+
+- **Scraping Inteligente**: Extração de dados do site da Embrapa com fallback automático
+- **Autenticação JWT**: Sistema completo de registro e login de usuários
+- **Cache Local**: Backup automático dos dados em SQLite para alta disponibilidade
+- **Validação Flexível**: Aceita códigos numéricos ou nomes descritivos (com/sem acentos)
+- **API Documentada**: Documentação interativa automática via Swagger/OpenAPI
 
 ---
 
-## Tecnologias utilizadas
+## 🛠 Tecnologias Utilizadas
 
-- Python 3.11
-- FastAPI
-- SQLAlchemy + SQLite
-- JWT (via PyJWT)
-- Bcrypt (para hash de senha)
-- BeautifulSoup (web scraping)
-- Uvicorn (servidor ASGI)
+- **Python 3.11+**
+- **FastAPI** - Framework web moderno e rápido
+- **SQLAlchemy + SQLite** - ORM e banco de dados
+- **JWT (PyJWT)** - Autenticação segura
+- **Bcrypt** - Hash seguro de senhas
+- **BeautifulSoup4** - Web scraping
+- **Uvicorn** - Servidor ASGI
+- **Pydantic** - Validação de dados
 
 ---
 
-## Estrutura do projeto
+## 📁 Estrutura do Projeto
 
 ```
 app/
-├── auth/                  # Rotas e utilitários de autenticação
+├── auth/                  # Módulo de autenticação
 │   ├── __init__.py
-│   ├── auth_utils.py      # Funções de criação e verificação de tokens, hash de senha
-│   └── routes.py          # Rotas de autenticação (/auth/usuario, /auth/token)
+│   ├── auth_utils.py      # Utilitários JWT e hash de senha
+│   └── routes.py          # Rotas de autenticação
 │
-├── scrap/                 # Rotas, scraping e validações
+├── scrap/                 # Módulo de scraping
 │   ├── __init__.py
-│   ├── scraper.py         # Lógica principal de scraping e fallback
-│   ├── validators.py      # Validação de parâmetros de entrada
-│   └── routes.py          # Rotas para scraping (/scrap/tabela)
+│   ├── scraper.py         # Lógica de scraping e fallback
+│   ├── validators.py      # Validação e normalização de parâmetros
+│   └── routes.py          # Rotas de scraping
 │
-├── database.py            # Configuração e sessão do banco de dados SQLite
-├── config.py              # Leitura de variáveis do ambiente (.env)
-├── schemas.py             # Schemas Pydantic para validação de dados
-├── models.py              # Modelos SQLAlchemy representando tabelas do DB
-└── main.py                # Entrada principal da aplicação FastAPI
+├── config.py              # Configurações e variáveis de ambiente
+├── database.py            # Configuração do banco SQLite
+├── models.py              # Modelos SQLAlchemy
+├── schemas.py             # Schemas Pydantic para validação
+└── main.py                # Aplicação principal FastAPI
 ```
 
 ---
-## Fonte de dados
 
-Dados obtidos diretamente do site da [Embrapa Vitivinicultura](http://vitibrasil.cnpuv.embrapa.br).
+## 📊 Fonte de Dados
+
+Dados extraídos diretamente do site oficial da [Embrapa Vitivinicultura](http://vitibrasil.cnpuv.embrapa.br), incluindo informações sobre:
+
+- **Produção** de uvas
+- **Processamento** por tipo de uva
+- **Comercialização** no mercado interno
+- **Importação/Exportação** de produtos vitivinícolas
 
 ---
 
-## Como rodar o projeto
+## ⚡ Instalação e Execução
+
+### Pré-requisitos
+- Python 3.11 ou superior
+- pip (gerenciador de pacotes Python)
 
 ### 1. Clone o repositório
 ```bash
@@ -53,10 +83,15 @@ git clone https://github.com/seuusuario/tech-challenge.git
 cd tech-challenge
 ```
 
-### 2. Crie o ambiente virtual e ative
+### 2. Crie e ative o ambiente virtual
 ```bash
 python -m venv venv
-source venv/bin/activate  # ou venv\Scripts\activate no Windows
+
+# Linux/macOS
+source venv/bin/activate
+
+# Windows
+venv\Scripts\activate
 ```
 
 ### 3. Instale as dependências
@@ -64,57 +99,72 @@ source venv/bin/activate  # ou venv\Scripts\activate no Windows
 pip install -r requirements.txt
 ```
 
-### 4. Crie o arquivo `.env` com base no `.env.example`
+### 4. Configure as variáveis de ambiente
 ```bash
 cp .env.example .env
 ```
 
-### 5. Rode o servidor
-```bash
-uvicorn app.main:app --reload
-```
-Observação:
-Ao iniciar o servidor pela primeira vez, o banco de dados SQLite e as tabelas são criados automaticamente pelo SQLAlchemy com base nos modelos definidos em models.py.
-
----
-
-## Variáveis de ambiente necessárias
-
+Edite o arquivo `.env` com suas configurações:
 ```env
-SECRET_KEY=suachavesecreta
+SECRET_KEY=sua_chave_secreta_muito_segura_aqui
 ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
+ACCESS_TOKEN_EXPIRE_MINUTES=60
 DATABASE_URL=sqlite:///./scrap_embrapa.db
 SCRAP_TIMEOUT_SECONDS=10
 ```
 
----
+### 5. Execute o servidor
+```bash
+uvicorn app.main:app --reload
+```
 
-## Autenticação
+A API estará disponível em: `http://localhost:8000`
 
-- O login é feito com `HTTP Basic Auth` via endpoint `/auth/token`.
-- As rotas protegidas exigem `Authorization: Bearer <seu_token>` no cabeçalho.
+> **📝 Nota:** Na primeira execução, o banco SQLite e as tabelas são criados automaticamente.
 
----
+### 🌐 Ou acesse a versão online
 
-## Endpoints principais
-
-| Método | Rota                 | Descrição                                     |
-|--------|----------------------|-----------------------------------------------|
-| POST   | `/auth/usuario`      | Criação de novo usuário                       |
-| POST   | `/auth/token`        | Login e geração de token JWT                  |
-| GET    | `/scrap/tabela`      | Realiza scraping da Embrapa (requer token)    |
+Prefere testar sem instalar? Use nossa **API em produção**:
+- **Base URL:** `https://tech-challenge-api-embrapa.onrender.com`
+- **Documentação:** `https://tech-challenge-api-embrapa.onrender.com/docs`
 
 ---
 
-##  Detalhes das Rotas
+## 🔐 Autenticação
 
-###  POST `/auth/usuario`
+A API utiliza autenticação JWT com as seguintes características:
 
-Cria um novo usuário no sistema com hash de senha seguro.
+- **Registro**: Criação de usuários com hash seguro de senhas (bcrypt)
+- **Login**: Autenticação via HTTP Basic Auth
+- **Proteção**: Rotas protegidas requerem `Authorization: Bearer <token>`
+- **Expiração**: Tokens configuráveis (padrão: 60 minutos)
 
-* **Body (JSON):**
+---
 
+## 📋 Endpoints da API
+
+### Autenticação
+
+| Método | Endpoint              | Descrição                    | Autenticação |
+|--------|-----------------------|------------------------------|--------------|
+| POST   | `/auth/registrar_usuario` | Criar novo usuário           | ❌           |
+| POST   | `/auth/token`         | Login e obtenção de token    | Basic Auth   |
+
+### Scraping
+
+| Método | Endpoint        | Descrição                           | Autenticação |
+|--------|-----------------|-------------------------------------|--------------|
+| GET    | `/scrap/tabela` | Scraping de dados da Embrapa        | Bearer Token |
+
+---
+
+## 📖 Guia de Uso dos Endpoints
+
+### 🔹 POST `/auth/registrar_usuario`
+
+Registra um novo usuário no sistema.
+
+**Body (JSON):**
 ```json
 {
   "usuario": "usuario1",
@@ -123,8 +173,7 @@ Cria um novo usuário no sistema com hash de senha seguro.
 }
 ```
 
-* **Resposta:**
-
+**Resposta de Sucesso (201):**
 ```json
 {
   "id": 1,
@@ -133,74 +182,71 @@ Cria um novo usuário no sistema com hash de senha seguro.
 }
 ```
 
-###  POST `/auth/token`
+### 🔹 POST `/auth/token`
 
-Gera o token JWT com base nas credenciais do usuário (HTTP Basic Auth). Esse usuário deve ser criado na rota `/auth/usuario`.
+Autentica usuário e retorna token JWT.
 
-* **Autenticação:** Authorization: Basic `<base64(usuario:senha)>`
-* **Resposta:**
+**Headers:**
+```
+Authorization: Basic <base64(usuario:senha)>
+```
 
+**Resposta de Sucesso (200):**
 ```json
 {
-  "access_token": "<token>",
-  "token_type": "bearer"
+  "acesso_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "tipo_token": "bearer"
 }
 ```
 
-###  GET `/scrap/tabela`
+### 🔹 GET `/scrap/tabela`
 
-- Realiza scraping com base em três parâmetros obrigatórios: `ano`, `opcao` e `subopcao`. 
-- Quando uma tabela é consultada pela primeira vez, seus dados são extraídos do site e armazenados localmente no banco de dados.
-- Em chamadas futuras, se o site da Embrapa estiver indisponível, a API busca no banco de dados se a tabela correspondente já foi salva anteriormente.
-- Caso os dados existam no banco, eles são retornados como fallback automático — garantindo maior disponibilidade da API mesmo em caso de instabilidade externa.
+Realiza scraping dos dados da Embrapa ou retorna dados do cache local.
 
-* **Headers:** Authorization: Bearer `<token>`
-* **Query Params:**
+**Headers:**
+```
+Authorization: Bearer <seu_token>
+```
 
-  * `ano=2023`
-  * `opcao=Processamento`
-  * `subopcao=Viníferas`
+**Query Parameters:**
 
----
+| Parâmetro | Tipo   | Obrigatório | Descrição                              | Exemplo     |
+|-----------|--------|-------------|----------------------------------------|-------------|
+| `ano`     | string | ✅          | Ano dos dados (1970-2024)             | `"2023"`    |
+| `opcao`   | string | ✅          | Código ou nome da categoria principal  | `"03"` ou `"Processamento"` |
+| `subopcao`| string | ✅          | Código ou nome da subcategoria         | `"01"` ou `"Viníferas"` |
 
-### Detalhes dos parâmetros da rota /scrap/tabela
-
-Esta rota realiza scraping dos dados do site da Embrapa Viticultura com base em três parâmetros obrigatórios:
-
-### 🔹 ano (str)
-
-Ano dos dados desejados.
-
-- **Formato aceito:**  ano (ex: 2023)
-- **Intervalo válido:** de **1970 a 2024**
-- Valores fora desse intervalo serão rejeitados com erro 400.
+**Exemplo de Chamada:**
+```
+GET /scrap/tabela?ano=2023&opcao=Processamento&subopcao=Viníferas
+```
 
 ---
 
-### 🔹 opcao (str)
+## 📝 Parâmetros Detalhados
 
-Corresponde às **abas principais** do site da Embrapa.
+### 🎯 Parâmetro `ano`
+- **Formato:** String representando o ano
+- **Intervalo:** 1970 a 2024
+- **Exemplo:** `"2023"`
 
-Você pode informar tanto o **nome descritivo** quanto o **código numérico** da aba.
+### 🎯 Parâmetro `opcao`
 
-| Nome              | Código (`opcao`) |
-|-------------------|------------------|
-| Produção          | `02`             |
-| Processamento     | `03`             |
-| Comercialização   | `04`             |
-| Importação        | `05`             |
-| Exportação        | `06`             |
+Aceita código numérico ou nome (case-insensitive, com/sem acentos):
 
----
+| Nome              | Código |
+|-------------------|--------|
+| Produção          | `02`   |
+| Processamento     | `03`   |
+| Comercialização   | `04`   |
+| Importação        | `05`   |
+| Exportação        | `06`   |
 
-### 🔹 subopcao (str)
+### 🎯 Parâmetro `subopcao`
 
-Subcategorias específicas disponíveis apenas para algumas `opcao`.
+Varia conforme a `opcao` selecionada:
 
-Você pode informar tanto o **nome descritivo** quanto o **código numérico** da aba.
-
-#### Para `Processamento (03)`
-
+#### Para Processamento (`03`)
 | Nome                          | Código |
 |-------------------------------|--------|
 | Viníferas                     | `01`   |
@@ -208,8 +254,7 @@ Você pode informar tanto o **nome descritivo** quanto o **código numérico** d
 | Uvas de Mesa                  | `03`   |
 | Sem Classificação             | `04`   |
 
-#### Para `Importação (05)`
-
+#### Para Importação (`05`)
 | Nome            | Código |
 |------------------|--------|
 | Vinhos de Mesa   | `01`   |
@@ -218,8 +263,7 @@ Você pode informar tanto o **nome descritivo** quanto o **código numérico** d
 | Uvas Passas      | `04`   |
 | Suco de Uva      | `05`   |
 
-#### Para `Exportação (06)`
-
+#### Para Exportação (`06`)
 | Nome            | Código |
 |------------------|--------|
 | Vinhos de Mesa   | `01`   |
@@ -227,59 +271,104 @@ Você pode informar tanto o **nome descritivo** quanto o **código numérico** d
 | Uvas Frescas     | `03`   |
 | Suco de Uva      | `04`   |
 
----
-
-### Observações
-
-- Se a `opcao` for Produção (`02`) ou Comercialização (`04`), o valor da `subopcao` pode ser `"01"` ou omitido.
-- Os parâmetros são **case-insensitive** e aceitam nomes com ou sem acento (ex: `"viniferas"`, `"Viníferas"`, `"viniferás"` → todos funcionam).
-- Exemplo de chamada: `"/scrap/tabela?ano=2023&opcao=Processamento&subopcao=Viníferas"`
+> **💡 Dica:** Para Produção e Comercialização, use `subopcao="01"` ou omita o parâmetro.
 
 ---
 
-## Exemplo de uso com Postman
+## 🧪 Testando com Postman
 
-### 1. Criar usuário
+> **💡 Dica:** Use a API online em `https://tech-challenge-api-embrapa.onrender.com` ou sua instalação local.
 
-- Método: `POST`
-- URL: `http://localhost:8000/auth/usuario`
-- Body → `raw` → `JSON`:
-```json
+### 1. Registrar Usuário
+```
+POST https://tech-challenge-api-embrapa.onrender.com/auth/registrar_usuario
+Content-Type: application/json
+
 {
-  "usuario": "usuario1",
+  "usuario": "teste",
   "senha": "senha123",
-  "email": "usuario1@email.com"
+  "email": "teste@email.com"
 }
+```
+
+### 2. Obter Token
+```
+POST https://tech-challenge-api-embrapa.onrender.com/auth/token
+Authorization: Basic dGVzdGU6c2VuaGExMjM=  # base64(teste:senha123)
+```
+
+### 3. Fazer Scraping
+```
+GET https://tech-challenge-api-embrapa.onrender.com/scrap/tabela?ano=2023&opcao=03&subopcao=01
+Authorization: Bearer <seu_token_aqui>
 ```
 
 ---
 
-### 2. Obter token JWT
+## 🔄 Sistema de Fallback
 
-- Método: `POST`
-- URL: `http://localhost:8000/auth/token`
-- Authorization: tipo **Basic Auth**
-  - Username: `usuario1`
-  - Password: `senha123`
+A API implementa um sistema inteligente de fallback:
 
----
+1. **Tentativa Primária**: Scraping direto do site da Embrapa
+2. **Cache Local**: Se o site estiver indisponível, busca dados salvos no SQLite
+3. **Erro 503**: Apenas se não houver dados nem online nem no cache
 
-### 3. Acessar a rota protegida
-
-- Método: `GET`
-- URL: `http://localhost:8000/scrap/tabela?ano=2023&opcao=02&subopcao=01`
-- Headers:
-  - Key: `Authorization`
-  - Value: `Bearer <seu_token_gerado>`
+Isso garante **alta disponibilidade** mesmo quando o site oficial estiver fora do ar.
 
 ---
 
-### Documentação interativa
-A API possui documentação interativa acessível em `http://localhost:8000/docs` após iniciar o servidor.
-Lá você pode testar as rotas, visualizar os schemas e exemplos facilmente.
+## 📚 Documentação Interativa
+
+### 🌐 Online (Recomendado)
+- **Swagger UI**: https://tech-challenge-api-embrapa.onrender.com/docs
+- **ReDoc**: https://tech-challenge-api-embrapa.onrender.com/redoc
+
+### 💻 Local
+Após iniciar o servidor localmente:
+- **Swagger UI**: `http://localhost:8000/docs`
+- **ReDoc**: `http://localhost:8000/redoc`
+
+Ambas oferecem interface completa para testar todos os endpoints diretamente no navegador.
 
 ---
 
-## Licença
+## ⚠️ Códigos de Erro
 
-Distribuído sob a licença MIT.
+| Código | Descrição                                    |
+|--------|----------------------------------------------|
+| 400    | Parâmetros inválidos (ano, opção, subopção) |
+| 401    | Token JWT ausente, inválido ou expirado     |
+| 404    | Tabela não encontrada no site da Embrapa    |
+| 503    | Site fora do ar sem backup local disponível |
+
+---
+
+## 🤝 Contribuição
+
+1. Fork o projeto
+2. Crie uma branch para sua feature (`git checkout -b feature/nova-feature`)
+3. Commit suas mudanças (`git commit -am 'Adiciona nova feature'`)
+4. Push para a branch (`git push origin feature/nova-feature`)
+5. Abra um Pull Request
+
+---
+
+## 📄 Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+## 👤 Autor
+
+**Celso Gabriel Vieira Ribeiro Lopes**
+- Email: c.gabriel.vieira@hotmail.com
+- GitHub: [@Lakand](https://github.com/Lakand)
+
+---
+
+## 🙏 Agradecimentos
+
+- [Embrapa Vitivinicultura](http://vitibrasil.cnpuv.embrapa.br) pelos dados públicos
+- Comunidade FastAPI pela excelente documentação
+- Colaboradores e revisores do projeto
