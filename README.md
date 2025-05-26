@@ -60,6 +60,12 @@ app/
 
 ---
 
+## 🖼️ Diagrama do projeto
+
+![Diagrama do projeto](images/diagrama_tech_challenge.png)
+
+---
+
 ## 📊 Fonte de Dados
 
 Dados extraídos diretamente do site oficial da [Embrapa Vitivinicultura](http://vitibrasil.cnpuv.embrapa.br), incluindo informações sobre:
