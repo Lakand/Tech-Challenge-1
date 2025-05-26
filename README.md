@@ -164,6 +164,14 @@ A API utiliza autenticação JWT com as seguintes características:
 
 Registra um novo usuário no sistema.
 
+#### **Regras de Validação:**
+
+| Campo    | Regra                                    | Exemplo Válido     | Exemplo Inválido |
+|----------|------------------------------------------|--------------------|------------------|
+| **usuario** | • Mínimo: 3 caracteres<br>• Deve ser único no sistema | `"usuario1"`       | `"ab"` (muito curto) |
+| **senha**   | • Mínimo: 6 caracteres                    | `"senha123"`       | `"123"` (muito curta) |
+| **email**   | • Formato de e-mail válido<br>• Deve ser único no sistema | `"user@email.com"` | `"email-inválido"` |
+
 **Body (JSON):**
 ```json
 {
