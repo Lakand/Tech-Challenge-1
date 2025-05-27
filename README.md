@@ -64,6 +64,7 @@ app/
 
 ![Diagrama do projeto](images/diagrama_tech_challenge.png)
 
+
 ---
 
 ## 📊 Fonte de Dados
