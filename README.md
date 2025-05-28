@@ -19,6 +19,8 @@ API REST desenvolvida em FastAPI que realiza scraping de tabelas do site da Embr
 
 **Slide da apresentação:** https://docs.google.com/presentation/d/1TbjySUIK1lTiF8nnhlKdMLTh2a3gcVCJr0jtxmAv00s/edit?usp=sharing
 
+**Diagrama da arquitetura:** https://docs.google.com/presentation/d/1lQ6WPLM55SJcKQ-YjSoWwSa3ONreLiiBsLC38-8s1uU/edit?usp=sharing
+
 **IMPORTANTE: O banco de dados será mantido no github pois o site da embrapa está constantemente offline. Todas as tabelas de 2022 e 2023 estaram salvas no DB.**
 
 ## 🚀 Funcionalidades
