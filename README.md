@@ -70,7 +70,7 @@ app/
 
 ## 🖼️ Diagrama do projeto
 
-![Diagrama do projeto](images/diagrama_tech_challenge1.png)
+![Diagrama do projeto](images/diagrama_tech_challenge.png)
 
 ---
 
